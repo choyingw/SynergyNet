@@ -51,10 +51,10 @@ Print-out results and visualization under 'results/' (see 'demo/' for some sampl
 
 **TODO**
 
-- [X] Single-Image inference
-- [X] Add a renderer and 3D face output
-- [X] Training script
-- [X] Texture synthesis in the supplementary
+- [ ] Single-Image inference
+- [ ] Add a renderer and 3D face output
+- [ ] Training script
+- [ ] Texture synthesis in the supplementary
 
 
 **More Results**
