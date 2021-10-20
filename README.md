@@ -23,7 +23,7 @@ This paper supersedes the previous version of M3-LRN.
 
     ```git clone https://github.com/choyingw/SynergyNet```
 
-    ```cd Synergynet ```
+    ```cd SynergyNet ```
 
 2. Use conda
 
