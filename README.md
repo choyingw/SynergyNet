@@ -12,7 +12,7 @@ This paper supersedes the previous version of M3-LRN.
 **Advantages:**
 
 &diams; SOTA on all 3D facial alignment, face orientation estimation, and 3D face modeling.<br><br>
-&diams; Fast inference with 3000fps on a RTX 2080 Ti.<br><br>
+&diams; Fast inference with 3000fps on a laptop RTX 2080 Ti.<br><br>
 &diams; Simple implementation with only widely used operations.<br><br>
 
 
@@ -38,8 +38,10 @@ This paper supersedes the previous version of M3-LRN.
 4. Prepare data
 
 Download data [<a href="https://drive.google.com/file/d/1YVBRcXmCeO1t5Bepv67KVr_QKcOur3Yy/view?usp=sharing">here</a>] and
-[<a href="https://drive.google.com/file/d/1SQsMhvAmpD1O8Hm0yEGom0C0rXtA0qs8/view?usp=sharing">here</a>]. Extract these data under the repo root
-These data are processed from [<a href="https://github.com/cleardusk/3DDFA">3DDFA</a>] and [<a href="https://github.com/shamangary/FSA-Net">FSA-Net</a>]
+[<a href="https://drive.google.com/file/d/1SQsMhvAmpD1O8Hm0yEGom0C0rXtA0qs8/view?usp=sharing">here</a>]. Extract these data under the repo root.
+
+These data are processed from [<a href="https://github.com/cleardusk/3DDFA">3DDFA</a>] and [<a href="https://github.com/shamangary/FSA-Net">FSA-Net</a>].
+
 Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX6iTeJcNbh-jgHjWDoemfrzG/view?usp=sharing">here</a>]. Put the model under 'models/'
 
 
@@ -47,7 +49,7 @@ Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX
 
     ```python benchmark.py -w pretrained/best.pth.tar```
 
-Print-out results and visualization under 'results/' (see 'demo/' for some sample reference) are shown.
+Print-out results and visualization under 'results/' (see 'demo/' for some sample references) are shown.
 
 **TODO**
 
