@@ -11,6 +11,8 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 
 This paper supersedes the previous version of M3-LRN.
 
+<img src='demo/demo.gif'>
+
 <img src='demo/teaser.png'>
 
 **Advantages:**
