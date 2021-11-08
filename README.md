@@ -64,6 +64,9 @@ Print-out results and visualization under 'results/' (see 'demo/' for some sampl
 - [ ] Training script
 - [ ] Texture synthesis in the supplementary
 
+We show a comparison with [<a href="https://github.com/YadiraF/DECA">DECA</a>] using the top-3 largest roll angle samples in AFLW2000-3D.
+
+<img src='demo/comparison-deca.png'>
 
 **More Results**
 
