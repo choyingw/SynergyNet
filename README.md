@@ -57,11 +57,22 @@ Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX
 
 Print-out results and visualization under 'results/' (see 'demo/' for some sample references) are shown.
 
+**Training**
+
+1. Download data in last section: 'Evaluation-4 Prepare data'.
+
+2. Download training data from [<a href="https://github.com/cleardusk/3DDFA">3DDFA</a>]: train_aug_120x120.zip and extract the zip file under the root folder (This training size is about 44G).
+
+3. 
+    ```bash train_script.sh```
+
+4. Please refer to train_script for hyperparameters, such as learning rate, epochs, or GPU device. 
+
 **TODO**
 
 - [ ] Single-Image inference
 - [ ] Add a renderer and 3D face output
-- [ ] Training script
+- [O] Training script
 - [ ] Texture synthesis in the supplementary
 
 We show a comparison with [<a href="https://github.com/YadiraF/DECA">DECA</a>] using the top-3 largest roll angle samples in AFLW2000-3D.
