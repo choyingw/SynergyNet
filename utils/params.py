@@ -15,7 +15,6 @@ class ParamsPack():
 			# PCA basis for shape, expression, texture
 			self.w_shp = _load(osp.join(d, 'w_shp_sim.npy'))
 			self.w_exp = _load(osp.join(d, 'w_exp_sim.npy'))
-			self.w_tex = _load(osp.join(d, 'w_tex_sim.npy'))[:,:40]
 			# param_mean and param_std are used for re-whitening
 			meta = _load(osp.join(d, 'param_whitening.pkl'))
 			self.param_mean = meta.get('param_mean')
@@ -23,9 +22,8 @@ class ParamsPack():
 			# mean values
 			self.u_shp = _load(osp.join(d, 'u_shp.npy'))
 			self.u_exp = _load(osp.join(d, 'u_exp.npy'))
-			self.u_tex = _load(osp.join(d, 'u_tex.npy'))
 			self.u = self.u_shp + self.u_exp
-			self.w = np.concatenate((self.w_shp, self.w_exp, self.w_tex), axis=1)
+			self.w = np.concatenate((self.w_shp, self.w_exp), axis=1)
 			# base vector for landmarks
 			self.w_base = self.w[self.keypoints]
 			self.w_norm = np.linalg.norm(self.w, axis=0)

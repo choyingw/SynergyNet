@@ -143,59 +143,12 @@ class MobileNetV2(nn.Module):
         self.num_ori = 12
         self.num_shape = 40
         self.num_exp = 10
-        self.num_texture = 40
-        self.num_bin = 121
-        self.num_scale = 1
-        self.num_trans = 3
-
 
 
         self.classifier_ori = nn.Sequential(
             nn.Dropout(0.2),
             nn.Linear(self.last_channel, self.num_ori),
         )
-        # self.classifier_yaw = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel, self.num_bin),
-        # )
-        # self.classifier_pitch = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel, self.num_bin),
-        # )
-        # self.classifier_roll = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel, self.num_bin),
-        # )
-        # self.classifier_scale = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel, self.num_scale),
-        # )
-        # self.classifier_trans = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel, self.num_trans),
-        # )
-
-        # GeoNet
-        # self.geoNet = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Conv1d(self.last_channel, self.last_channel//2, 1, 1, 0, bias=True),
-        #     nn.Conv1d(self.last_channel//2, self.last_channel//4, 1, 1, 0, bias=True),
-        #     nn.ReLU6(inplace=True),
-        # )
-
-        # self.classifier_shape = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel//4, self.num_shape),
-        # )
-        # self.classifier_exp = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel//4, self.num_exp),
-        # )
-        # self.classifier_texture = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel, self.num_texture),
-        # )
-
         self.classifier_shape = nn.Sequential(
             nn.Dropout(0.2),
             nn.Linear(self.last_channel, self.num_shape),
@@ -204,10 +157,6 @@ class MobileNetV2(nn.Module):
             nn.Dropout(0.2),
             nn.Linear(self.last_channel, self.num_exp),
         )
-        # self.classifier_texture = nn.Sequential(
-        #     nn.Dropout(0.2),
-        #     nn.Linear(self.last_channel, self.num_texture),
-        # )
 
         # weight initialization
         for m in self.modules():
@@ -227,36 +176,17 @@ class MobileNetV2(nn.Module):
         # (this one) needs to have a name other than `forward` that can be accessed in a subclass
 
         x = self.features(x)
-        # Cannot use "squeeze" as batch-size can be 1 => must use reshape with x.shape[0]
 
         x = nn.functional.adaptive_avg_pool2d(x, 1)
         x = x.reshape(x.shape[0], -1)
 
         pool_x = x.clone()
 
-        ## Bin-based
-        # pre_yaw = self.classifier_yaw(x)
-        # pre_pitch = self.classifier_pitch(x)
-        # pre_roll = self.classifier_roll(x)
-        # pre_scale = self.classifier_scale(x)
-        # pre_trans = self.classifier_trans(x)
-
         x_ori = self.classifier_ori(x)
-
-        #GeoNet
-        # x_geo = self.geoNet(x.unsqueeze(2)).squeeze(2)
-        # x_shape = self.classifier_shape(x_geo)
-        # x_exp = self.classifier_exp(x_geo)
-
         x_shape = self.classifier_shape(x)
         x_exp = self.classifier_exp(x)
 
-        #x_tex = self.classifier_texture(x)
-        #x = torch.cat((x_ori, x_shape, x_exp, x_tex), dim=1)
         x = torch.cat((x_ori, x_shape, x_exp), dim=1)
-        
-        #x = torch.cat((pre_yaw, pre_pitch, pre_roll, pre_scale, pre_trans, x_shape, x_exp, x_tex), dim=1)
-        
         return x, pool_x
 
     def forward(self, x):

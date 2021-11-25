@@ -37,10 +37,13 @@ class ParamLoss(nn.Module):
         if mode == 'normal':
             loss = self.criterion(input[:,:12], target[:,:12]).mean(1) + self.criterion(input[:,12:], target[:,12:]).mean(1)
             return torch.sqrt(loss)
-        elif mode == 'no_tex':
+        if mode == 'no_tex':
             loss = self.criterion(input[:,:12], target[:,:12]).mean(1) + self.criterion(input[:,12:62], target[:,12:62]).mean(1)
             return torch.sqrt(loss)
-        elif mode == 'only_pose':
+        if mode == 'only_3dmm':
+            loss = self.criterion(input[:,:50], target[:,12:62]).mean(1)
+            return torch.sqrt(loss)
+        if mode == 'only_pose':
             loss = self.criterion(input[:,:12], target[:,:12]).mean(1)
             return loss
 
