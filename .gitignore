@@ -3,3 +3,6 @@ results
 3dmm_data
 aflw2000_data
 pretrained
+*.zip
+train_aug_120x120
+ckpts
