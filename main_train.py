@@ -51,7 +51,6 @@ def parse_args():
     parser.add_argument('--test_initial', default='false', type=str2bool)
     parser.add_argument('--warmup', default=-1, type=int)
     parser.add_argument('--param-fp-train',default='',type=str)
-    parser.add_argument('--data_ver', default='v1', type=str)
     parser.add_argument('--img_size', default=120, type=int)
     parser.add_argument('--save_val_freq', default=10, type=int)
 
@@ -225,7 +224,7 @@ def main():
 
         filename = f'{args.snapshot}_checkpoint_epoch_{epoch}.pth.tar'
         # save checkpoints and current model validation
-        if (epoch % args.save_val_freq == 0) or (epoch==args.epochs) or ((epoch >= 45) and (epoch % 2 ==0)):
+        if (epoch % args.save_val_freq == 0) or (epoch==args.epochs):
             save_checkpoint(
                 {
                     'epoch': epoch,

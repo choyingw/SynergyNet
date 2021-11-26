@@ -228,6 +228,7 @@ class CenterCrop(object):
         if not(_is_tensor_image(img)):
             raise TypeError('img should be tensor. Got {}'.format(type(img)))
         if img.ndim == 3:
+            crop_backgnd[:, crop_margins:h-1*crop_margins, crop_margins:w-1*crop_margins] = img[:, crop_margins: h-crop_margins, crop_margins: w-crop_margins]
             # random center crop
             if (rand < self.prob) and (self.mode=='train'):
                 func = self.switcher.get(random.randint(1,7))
