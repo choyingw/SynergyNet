@@ -28,29 +28,31 @@ def parse_param_62(param):
 
 # Image-to-parameter
 class I2P(nn.Module):
-    def __init__(self, args):
-        super(I2P, self).__init__()
-        self.args = args
-        # backbone definition
-        if 'mobilenet_v2' in self.args.arch:
-            self.backbone = getattr(mobilenetv2_backbone, args.arch)()
-        elif 'mobilenet' in self.args.arch:
-            self.backbone = getattr(mobilenetv1_backbone, args.arch)()        
-        elif 'resnet' in self.args.arch:
-            self.backbone = getattr(resnet_backbone, args.arch)(pretrained=False)
-        elif 'ghostnet' in self.args.arch:
-            self.backbone = getattr(ghostnet_backbone, args.arch)()
+	def __init__(self, args):
+		super(I2P, self).__init__()
+		self.args = args
+		# backbone definition
+		if 'mobilenet_v2' in self.args.arch:
+			self.backbone = getattr(mobilenetv2_backbone, args.arch)(pretrained=False)
+		elif 'mobilenet' in self.args.arch:
+			self.backbone = getattr(mobilenetv1_backbone, args.arch)()		
+		elif 'resnet' in self.args.arch:
+			self.backbone = getattr(resnet_backbone, args.arch)(pretrained=False)
+		elif 'ghostnet' in self.args.arch:
+			self.backbone = getattr(ghostnet_backbone, args.arch)()
+		else:
+			raise RuntimeError("Please choose [mobilenet_v2, mobilenet_1, resnet50, or ghostnet]")
 
-    def forward(self,input, target):
-        """Training time forward"""
-        _3D_attr, avgpool = self.backbone(input)
-        _3D_attr_GT = target.type(torch.cuda.FloatTensor)
-        return _3D_attr, _3D_attr_GT, avgpool
+	def forward(self,input, target):
+		"""Training time forward"""
+		_3D_attr, avgpool = self.backbone(input)
+		_3D_attr_GT = target.type(torch.cuda.FloatTensor)
+		return _3D_attr, _3D_attr_GT, avgpool
 
-    def forward_test(self, input):
-        """ Testing time forward."""
-        _3D_attr, avgpool = self.backbone(input)
-        return _3D_attr, avgpool
+	def forward_test(self, input):
+		""" Testing time forward."""
+		_3D_attr, avgpool = self.backbone(input)
+		return _3D_attr, avgpool
 
 # Main model SynergyNet definition
 class SynergyNet(nn.Module):
@@ -92,70 +94,68 @@ class SynergyNet(nn.Module):
         self.register_buffer('w_exp_base', torch.Tensor(param_pack.w_exp_base).cuda(non_blocking=True))
         self.keypoints = torch.Tensor(param_pack.keypoints).long()
  
-        self.data_param = [self.param_mean, self.param_std, self.w_shp_base, self.u_base, self.w_exp_base]
+		self.data_param = [self.param_mean, self.param_std, self.w_shp_base, self.u_base, self.w_exp_base]
 
-    def reconstruct_vertex_62(self, param, whitening=True, dense=False, transform=True, lmk_pts=68):
-        """
-        Whitening param -> 3d vertex, based on the 3dmm param: u_base, w_shp, w_exp
-        dense: if True, return dense vertex, else return 68 sparse landmarks. All dense or sparse vertex is transformed to
-        image coordinate space, but without alignment caused by face cropping.
-        transform: whether transform to image space
-        Working with batched tensors. Using Fortan-type reshape.
-        """
-        
-        if whitening:
-            if param.shape[1] == 62:
-                param_ = param * self.param_std[:62] + self.param_mean[:62]
-            else:
-                raise RuntimeError('length of params mismatch')
+	def reconstruct_vertex_62(self, param, whitening=True, dense=False, transform=True, lmk_pts=68):
+		"""
+		Whitening param -> 3d vertex, based on the 3dmm param: u_base, w_shp, w_exp
+		dense: if True, return dense vertex, else return 68 sparse landmarks. All dense or sparse vertex is transformed to
+		image coordinate space, but without alignment caused by face cropping.
+		transform: whether transform to image space
+		Working with batched tensors. Using Fortan-type reshape.
+		"""
 
-        p, offset, alpha_shp, alpha_exp = parse_param_62(param_)
+		if whitening:
+			if param.shape[1] == 62:
+				param_ = param * self.param_std[:62] + self.param_mean[:62]
+			else:
+				raise RuntimeError('length of params mismatch')
 
-        if dense:
-            
-            vertex = p @ (self.u + self.w_shp @ alpha_shp + self.w_exp @ alpha_exp).contiguous().view(-1, 53215, 3).transpose(1,2) + offset
-            
-            if transform: 
-                # transform to image coordinate space
-                vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
+		p, offset, alpha_shp, alpha_exp = parse_param_62(param_)
 
-        else:
-            """For 68 pts"""
-            vertex = p @ (self.u_base + self.w_shp_base @ alpha_shp + self.w_exp_base @ alpha_exp).contiguous().view(-1, lmk_pts, 3).transpose(1,2) + offset
+		if dense:
+			
+			vertex = p @ (self.u + self.w_shp @ alpha_shp + self.w_exp @ alpha_exp).contiguous().view(-1, 53215, 3).transpose(1,2) + offset
+			
+			if transform: 
+				# transform to image coordinate space
+				vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
 
-            if transform: 
-                # transform to image coordinate space
-                vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
+		else:
+			"""For 68 pts"""
+			vertex = p @ (self.u_base + self.w_shp_base @ alpha_shp + self.w_exp_base @ alpha_exp).contiguous().view(-1, lmk_pts, 3).transpose(1,2) + offset
 
-        return vertex
+			if transform: 
+				# transform to image coordinate space
+				vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
 
-    def forward(self, input, target):
-        _3D_attr, _3D_attr_GT, avgpool = self.I2P(input, target)
-            
-        vertex_lmk = self.reconstruct_vertex_62(_3D_attr, dense=False)
-        vertex_GT_lmk = self.reconstruct_vertex_62(_3D_attr_GT, dense=False)
-        self.loss['loss_LMK_f0'] = 0.01 *self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)        
-        self.loss['loss_Param_In'] = 0.02 * self.ParamLoss(_3D_attr, _3D_attr_GT)
-        
-        """
-        point_residual = self.forwardDirection(vertex_lmk, avgpool, _3D_attr[:,12:52], _3D_attr[:,52:62])
-        vertex_lmk = vertex_lmk + 0.01 * point_residual
-        self.loss['loss_LMK_pointNet'] = 0.01 * self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)
+		return vertex
 
-        _3D_attr_S2 = self.reverseDirection(vertex_lmk)
-        self.loss['loss_Param_S2'] = 0.02 * self.ParamLoss(_3D_attr_S2, _3D_attr_GT, mode='only_3dmm')
-        self.loss['loss_Param_S1S2'] = 1 * self.ParamLoss(_3D_attr_S2, _3D_attr, mode='only_3dmm')
-        """
+	def forward(self, input, target):
+		_3D_attr, _3D_attr_GT, avgpool = self.I2P(input, target)
+			
+		vertex_lmk = self.reconstruct_vertex_62(_3D_attr, dense=False)
+		vertex_GT_lmk = self.reconstruct_vertex_62(_3D_attr_GT, dense=False)
+		self.loss['loss_LMK_f0'] = 0.05 *self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)		
+		self.loss['loss_Param_In'] = 0.02 * self.ParamLoss(_3D_attr, _3D_attr_GT)
 
-        return self.loss
+		point_residual = self.forwardDirection(vertex_lmk, avgpool, _3D_attr[:,12:52], _3D_attr[:,52:62])
+		vertex_lmk = vertex_lmk + 0.05 * point_residual
+		self.loss['loss_LMK_pointNet'] = 0.05 * self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)
 
-    def forward_test(self, input):
-        """test time forward"""
-        _3D_attr, _ = self.I2P.forward_test(input)
-        return _3D_attr
+		_3D_attr_S2 = self.reverseDirection(vertex_lmk)
+		self.loss['loss_Param_S2'] = 0.02 * self.ParamLoss(_3D_attr_S2, _3D_attr_GT, mode='only_3dmm')
+		self.loss['loss_Param_S1S2'] = 0.001 * self.ParamLoss(_3D_attr_S2, _3D_attr, mode='only_3dmm')
 
-    def get_losses(self):
-        return self.loss.keys()
+		return self.loss
+
+	def forward_test(self, input):
+		"""test time forward"""
+		_3D_attr, _ = self.I2P.forward_test(input)
+		return _3D_attr
+
+	def get_losses(self):
+		return self.loss.keys()
 
 
 if __name__ == '__main__':

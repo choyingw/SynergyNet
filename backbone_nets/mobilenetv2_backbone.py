@@ -1,7 +1,6 @@
 import torch
 from torch import nn
-#from .utils import load_state_dict_from_url
-
+from torch.hub import load_state_dict_from_url
 
 __all__ = ['MobileNetV2', 'mobilenet_v2']
 
@@ -205,5 +204,5 @@ def mobilenet_v2(pretrained=False, progress=True, **kwargs):
     if pretrained:
         state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'],
                                               progress=progress)
-        model.load_state_dict(state_dict)
+        model.load_state_dict(state_dict, strict=False)
     return model
