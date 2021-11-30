@@ -110,7 +110,7 @@ def extract_param(checkpoint_fp, root='', args=None, filelists=None, device_ids=
 
     model = SynergyNet(args)
     model = nn.DataParallel(model, device_ids=device_ids).cuda()
-    model.load_state_dict(checkpoint)
+    model.load_state_dict(checkpoint, strict=False)
 
     dataset = DDFATestDataset(filelists=filelists, root=root,
                               transform=transforms.Compose([ToTensor(), CenterCrop(5, mode='test') , Normalize(mean=127.5, std=128)  ]))
