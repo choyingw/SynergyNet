@@ -19,7 +19,7 @@ confidence_threshold = 0.05
 top_k = 5000
 keep_top_k = 750
 nms_threshold = 0.3
-vis_thres = 0.5
+vis_thres = 0.5 #0.5
 resize = 1
 
 scale_flag = True
