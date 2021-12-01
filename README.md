@@ -21,9 +21,9 @@ This paper supersedes the previous version of M3-LRN.
 
 **Advantages:**
 
-`:+1:` SOTA on all 3D facial alignment, face orientation estimation, and 3D face modeling.<br><br>
-`:+1:` Fast inference with 3000fps on a laptop RTX 2080 Ti.<br><br>
-`:+1:` Simple implementation with only widely used operations.<br><br>
+:+1: SOTA on all 3D facial alignment, face orientation estimation, and 3D face modeling.<br><br>
+:+1: Fast inference with 3000fps on a laptop RTX 2080 Ti.<br><br>
+:+1: Simple implementation with only widely used operations.<br><br>
 
 (This project is built/tested on Python 3.8 and PyTorch 1.9)
 
@@ -81,7 +81,7 @@ Print-out results and visualization under 'results/' (see 'demo/' for some sampl
 
 1. Follow Single Image Inference Demo: Step 1-4.
 
-2. Download training data from [<a href="https://github.com/cleardusk/3DDFA">3DDFA</a>]: train_aug_120x120.zip and extract the zip file under the root folder (This training size is about 44G).
+2. Download training data from [<a href="https://github.com/cleardusk/3DDFA">3DDFA</a>]: train_aug_120x120.zip and extract the zip file under the root folder (Containing about 680K images).
 
 3. 
     ```bash train_script.sh```
