@@ -22,7 +22,7 @@ This paper supersedes the previous version of M3-LRN.
 **Advantages:**
 
 :+1: SOTA on all 3D facial alignment, face orientation estimation, and 3D face modeling.<br><br>
-:+1: Fast inference with 3000fps on a laptop RTX 2080 Ti.<br><br>
+:+1: Fast inference with 3000fps on a laptop RTX 2080.<br><br>
 :+1: Simple implementation with only widely used operations.<br><br>
 
 (This project is built/tested on Python 3.8 and PyTorch 1.9)
