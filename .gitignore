@@ -6,3 +6,5 @@ pretrained
 *.zip
 train_aug_120x120
 ckpts
+uv_art
+art-all
