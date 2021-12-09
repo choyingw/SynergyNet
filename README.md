@@ -1,4 +1,4 @@
-# SynergyNet
+#  <div align="center"> SynergyNet</div>
 3DV 2021: Synergy between 3DMM and 3D Landmarks for Accurate 3D Facial Geometry
 
 Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther California
@@ -7,7 +7,7 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/synergy-between-3dmm-and-3d-landmarks-for/head-pose-estimation-on-aflw2000)](https://paperswithcode.com/sota/head-pose-estimation-on-aflw2000?p=synergy-between-3dmm-and-3d-landmarks-for)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/synergy-between-3dmm-and-3d-landmarks-for/face-alignment-on-aflw2000-3d)](https://paperswithcode.com/sota/face-alignment-on-aflw2000-3d?p=synergy-between-3dmm-and-3d-landmarks-for)
 
-[<a href="https://arxiv.org/abs/2110.09772">paper</a>] [<a href="https://choyingw.github.io/works/SynergyNet/index.html">project page</a>]
+[<a href="https://arxiv.org/abs/2110.09772">paper</a>] [<a href="https://youtu.be/i1Y8U2Z20ko">video</a>] [<a href="https://choyingw.github.io/works/SynergyNet/index.html">project page</a>]
 
 This paper supersedes the previous version of M3-LRN.
 
@@ -19,7 +19,7 @@ This paper supersedes the previous version of M3-LRN.
 
 <img src='demo/single.png'>
 
-**Advantages:**
+## <div align="center"> Advantages</div>
 
 :+1: SOTA on all 3D facial alignment, face orientation estimation, and 3D face modeling.<br><br>
 :+1: Fast inference with 3000fps on a laptop RTX 2080.<br><br>
@@ -27,7 +27,8 @@ This paper supersedes the previous version of M3-LRN.
 
 (This project is built/tested on Python 3.8 and PyTorch 1.9)
 
-**Single Image Inference Demo**
+## <div align="center"> Single Image Inference Demo</div>
+
 1. Clone
 
     ```git clone https://github.com/choyingw/SynergyNet```
@@ -67,7 +68,7 @@ Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX
 
     ```python singleImage.py -f img```
 
-**Evaluation**
+## <div align="center">Benchmark Evaluation</div>
 
 1. Follow Single Image Inference Demo: Step 1-4
 
@@ -77,7 +78,7 @@ Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX
 
 Print-out results and visualization under 'results/' (see 'demo/' for some sample references) are shown.
 
-**Training**
+## <div align="center">Training</div>
 
 1. Follow Single Image Inference Demo: Step 1-4.
 
@@ -88,7 +89,7 @@ Print-out results and visualization under 'results/' (see 'demo/' for some sampl
 
 4. Please refer to train_script for hyperparameters, such as learning rate, epochs, or GPU device. The default settings take ~19G on a 3090 GPU and about 6 hours for training. If your GPU is less than this size, please decrease the batch size and learning rate proportionally.
 
-**Textured Artistic Face Meshes**
+## <div align="center">Textured Artistic Face Meshes</div>
 
 1. Follow Single Image Inference Demo: Step 1-5.
 
@@ -99,12 +100,12 @@ Print-out results and visualization under 'results/' (see 'demo/' for some sampl
 
 Note that this artistic face dataset contains many different level/style face abstration. If a testing image is close to real, the result is much better than those of highly abstract samples.  
 
+## <div align="center">More Results</div>
 
 We show a comparison with [<a href="https://github.com/YadiraF/DECA">DECA</a>] using the top-3 largest roll angle samples in AFLW2000-3D.
 
 <img src='demo/comparison-deca.png'>
 
-**More Results**
 
 Facial alignemnt on AFLW2000-3D (NME of facial landmarks):
 
