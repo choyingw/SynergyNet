@@ -48,6 +48,9 @@ def main(args):
             files = sorted(glob.glob(args.files+'*.jpg'))
         else:
             files = sorted(glob.glob(args.files+'*.png'))
+
+        if args.num_img is not None:
+            files = files[:args.num_img]
     else:
         files = [args.files]
 
@@ -124,6 +127,7 @@ if __name__ == '__main__':
     parser.add_argument("--png", action="store_true", help="if images are with .png extension")
     parser.add_argument('--img_size', default=120, type=int)
     parser.add_argument('-b', '--batch-size', default=1, type=int)
+    parser.add_argument('-num_img', '--num_img', default=None, type=int)
 
     args = parser.parse_args()
     main(args)
