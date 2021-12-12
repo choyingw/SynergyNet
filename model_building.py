@@ -12,6 +12,7 @@ from backbone_nets import resnet_backbone
 from backbone_nets import mobilenetv1_backbone
 from backbone_nets import mobilenetv2_backbone
 from backbone_nets import ghostnet_backbone
+from backbone_nets import dcnv2
 from backbone_nets.pointnet_backbone import MLP_for, MLP_rev
 from loss_definition import ParamLoss, WingLoss
 
@@ -40,8 +41,10 @@ class I2P(nn.Module):
             self.backbone = getattr(resnet_backbone, args.arch)(pretrained=False)
         elif 'ghostnet' in self.args.arch:
             self.backbone = getattr(ghostnet_backbone, args.arch)()
+        elif 'dcnv2' in self.args.arch:
+            self.backbone = getattr(dcnv2, args.arch)(pretrained=False)
         else:
-            raise RuntimeError("Please choose [mobilenet_v2, mobilenet_1, resnet50, or ghostnet]")
+            raise RuntimeError("Please choose [mobilenet_v2, mobilenet_1, resnet50, ghostnet, or dcnv2]")
 
     def forward(self,input, target):
         """Training time forward"""

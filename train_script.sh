@@ -6,12 +6,12 @@ mkdir -p ${LOG_DIR}
 
 LOG_FILE="${LOG_DIR}/`date +'%Y-%m-%d_%H:%M.%S'`.log"
 
-python3 main_train.py --arch="mobilenet_v2" \
+python3 main_train.py --arch="dcnv2" \
     --start-epoch=1 \
     --snapshot="ckpts/SynergyNet" \
     --param-fp-train='./3dmm_data/param_all_norm_v201.pkl' \
     --warmup=5 \
-    --batch-size=900 \
+    --batch-size=20 \
     --base-lr=0.027 \
     --epochs=50 \
     --milestones=30,40 \
