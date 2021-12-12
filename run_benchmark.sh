@@ -2,4 +2,5 @@
 
 
 python3 benchmark.py \
-    -w pretrained/best.pth.tar \
+    -w ckpts/baseline_SynergyNet_checkpoint_epoch_30.pth.tar \
+    # -w pretrained/best.pth.tar \

@@ -24,3 +24,5 @@ python3 main_train.py --arch="mobilenet_v2" \
     --test_initial=True \
     --save_val_freq=5 \
     --resume="" \
+    --batch-size=16 \
+    --snapshot="ckpts/baseline_SynergyNet" \
