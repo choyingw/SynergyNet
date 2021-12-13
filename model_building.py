@@ -52,7 +52,7 @@ class I2P(nn.Module):
     def forward(self,input, target):
         """Training time forward"""
         _3D_attr, avgpool = self.backbone(input)
-        _3D_attr_GT = target.type(torch.FloatTensor).cuda.FloatTensor)
+        _3D_attr_GT = target.type(torch.FloatTensor).cuda()
         return _3D_attr, _3D_attr_GT, avgpool
 
     def forward_test(self, input):

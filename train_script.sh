@@ -24,7 +24,7 @@ python3 main_train.py \
     --save_val_freq=5 \
     --resume="" \
     --batch-size=16 \
-    --arch="dcnv1" \
     --arch="dcnv2" \
-    --snapshot="ckpts/dcnv1_SynergyNet" \
+    --arch="dcnv1" \
     --snapshot="ckpts/dcnv2_SynergyNet" \
+    --snapshot="ckpts/dcnv1_SynergyNet" \
