@@ -33,16 +33,6 @@ class DeformableConv2d(nn.Module):
         nn.init.constant_(self.offset_conv.weight, 0.)
         nn.init.constant_(self.offset_conv.bias, 0.)
 
-        self.modulator_conv = nn.Conv2d(in_channels,
-                                        1 * kernel_size[0] * kernel_size[1],
-                                        kernel_size=kernel_size,
-                                        stride=stride,
-                                        padding=self.padding,
-                                        bias=True)
-
-        nn.init.constant_(self.modulator_conv.weight, 0.)
-        nn.init.constant_(self.modulator_conv.bias, 0.)
-
         self.regular_conv = nn.Conv2d(in_channels=in_channels,
                                       out_channels=out_channels,
                                       kernel_size=kernel_size,
@@ -62,11 +52,10 @@ class DeformableConv2d(nn.Module):
                                           weight=self.regular_conv.weight,
                                           bias=self.regular_conv.bias,
                                           padding=self.padding,
-                                          mask=modulator,
                                           stride=self.stride)
         return x
 
-class DCNv2(nn.Module):
+class DCNv1(nn.Module):
     def __init__(self,
                 num_classes=1000,
                 width_mult=1.0,
@@ -75,7 +64,7 @@ class DCNv2(nn.Module):
                 block=None,
                 norm_layer=None):
 
-        super(DCNv2, self).__init__()
+        super(DCNv1, self).__init__()
 
         input_channel = 32
         input_channel = int(input_channel * width_mult)
@@ -140,8 +129,8 @@ class DCNv2(nn.Module):
     def forward(self, x):
         return self._forward_impl(x)
 
-def dcnv2(pretrained=False, progress=True, **kwargs):
-    model = DCNv2(**kwargs)
+def dcnv1(pretrained=False, progress=True, **kwargs):
+    model = DCNv1(**kwargs)
     # if pretrained:
     #     state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'],
     #                                           progress=progress)

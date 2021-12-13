@@ -13,6 +13,7 @@ from backbone_nets import mobilenetv1_backbone
 from backbone_nets import mobilenetv2_backbone
 from backbone_nets import ghostnet_backbone
 from backbone_nets import dcnv2
+from backbone_nets import dcnv1
 from backbone_nets.pointnet_backbone import MLP_for, MLP_rev
 from loss_definition import ParamLoss, WingLoss
 
@@ -36,20 +37,22 @@ class I2P(nn.Module):
         if 'mobilenet_v2' in self.args.arch:
             self.backbone = getattr(mobilenetv2_backbone, args.arch)(pretrained=False)
         elif 'mobilenet' in self.args.arch:
-            self.backbone = getattr(mobilenetv1_backbone, args.arch)()        
+            self.backbone = getattr(mobilenetv1_backbone, args.arch)()
         elif 'resnet' in self.args.arch:
             self.backbone = getattr(resnet_backbone, args.arch)(pretrained=False)
         elif 'ghostnet' in self.args.arch:
             self.backbone = getattr(ghostnet_backbone, args.arch)()
         elif 'dcnv2' in self.args.arch:
             self.backbone = getattr(dcnv2, args.arch)(pretrained=False)
+        elif 'dcnv1' in self.args.arch:
+            self.backbone = getattr(dcnv1, args.arch)(pretrained=False)
         else:
-            raise RuntimeError("Please choose [mobilenet_v2, mobilenet_1, resnet50, ghostnet, or dcnv2]")
+            raise RuntimeError("Please choose [mobilenet_v2, mobilenet_1, resnet50, ghostnet, dcnv1, or dcnv2]")
 
     def forward(self,input, target):
         """Training time forward"""
         _3D_attr, avgpool = self.backbone(input)
-        _3D_attr_GT = target.type(torch.cuda.FloatTensor)
+        _3D_attr_GT = target.type(torch.FloatTensor)#.cuda.FloatTensor)
         return _3D_attr, _3D_attr_GT, avgpool
 
     def forward_test(self, input):
@@ -62,7 +65,7 @@ class SynergyNet(nn.Module):
     def __init__(self, args):
         super(SynergyNet, self).__init__()
         self.triangles = sio.loadmat('./3dmm_data/tri.mat')['tri'] -1
-        self.triangles = torch.Tensor(self.triangles.astype(np.int)).long().cuda()
+        self.triangles = torch.Tensor(self.triangles.astype(np.int)).long()#.cuda()
         self.img_size = args.img_size
         # Image-to-parameter
         self.I2P = I2P(args)
@@ -72,7 +75,7 @@ class SynergyNet(nn.Module):
         self.reverseDirection = MLP_rev(68)
         self.LMKLoss_3D = WingLoss()
         self.ParamLoss = ParamLoss()
-        
+
         self.loss = {'loss_LMK_f0':0.0,
                     # 'loss_LMK_pointNet': 0.0,
                     'loss_Param_In':0.0,
@@ -80,11 +83,11 @@ class SynergyNet(nn.Module):
                     # 'loss_Param_S1S2': 0.0,
                     }
 
-        self.register_buffer('param_mean', torch.Tensor(param_pack.param_mean).cuda(non_blocking=True))
-        self.register_buffer('param_std', torch.Tensor(param_pack.param_std).cuda(non_blocking=True))
-        self.register_buffer('w_shp', torch.Tensor(param_pack.w_shp).cuda(non_blocking=True))
-        self.register_buffer('u', torch.Tensor(param_pack.u).cuda(non_blocking=True))
-        self.register_buffer('w_exp', torch.Tensor(param_pack.w_exp).cuda(non_blocking=True))
+        self.register_buffer('param_mean', torch.Tensor(param_pack.param_mean))#.cuda(non_blocking=True))
+        self.register_buffer('param_std', torch.Tensor(param_pack.param_std))#.cuda(non_blocking=True))
+        self.register_buffer('w_shp', torch.Tensor(param_pack.w_shp))#.cuda(non_blocking=True))
+        self.register_buffer('u', torch.Tensor(param_pack.u))#.cuda(non_blocking=True))
+        self.register_buffer('w_exp', torch.Tensor(param_pack.w_exp))#.cuda(non_blocking=True))
 
         # If doing only offline evaluation, use these
         # self.u_base = torch.Tensor(param_pack.u_base).cuda(non_blocking=True)
@@ -92,11 +95,11 @@ class SynergyNet(nn.Module):
         # self.w_exp_base = torch.Tensor(param_pack.w_exp_base).cuda(non_blocking=True)
 
         # Online training needs these to parallel
-        self.register_buffer('u_base', torch.Tensor(param_pack.u_base).cuda(non_blocking=True))
-        self.register_buffer('w_shp_base', torch.Tensor(param_pack.w_shp_base).cuda(non_blocking=True))
-        self.register_buffer('w_exp_base', torch.Tensor(param_pack.w_exp_base).cuda(non_blocking=True))
+        self.register_buffer('u_base', torch.Tensor(param_pack.u_base))#.cuda(non_blocking=True))
+        self.register_buffer('w_shp_base', torch.Tensor(param_pack.w_shp_base))#.cuda(non_blocking=True))
+        self.register_buffer('w_exp_base', torch.Tensor(param_pack.w_exp_base))#.cuda(non_blocking=True))
         self.keypoints = torch.Tensor(param_pack.keypoints).long()
- 
+
         self.data_param = [self.param_mean, self.param_std, self.w_shp_base, self.u_base, self.w_exp_base]
 
     def reconstruct_vertex_62(self, param, whitening=True, dense=False, transform=True, lmk_pts=68):
@@ -117,10 +120,10 @@ class SynergyNet(nn.Module):
         p, offset, alpha_shp, alpha_exp = parse_param_62(param_)
 
         if dense:
-            
+
             vertex = p @ (self.u + self.w_shp @ alpha_shp + self.w_exp @ alpha_exp).contiguous().view(-1, 53215, 3).transpose(1,2) + offset
-            
-            if transform: 
+
+            if transform:
                 # transform to image coordinate space
                 vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
 
@@ -128,7 +131,7 @@ class SynergyNet(nn.Module):
             """For 68 pts"""
             vertex = p @ (self.u_base + self.w_shp_base @ alpha_shp + self.w_exp_base @ alpha_exp).contiguous().view(-1, lmk_pts, 3).transpose(1,2) + offset
 
-            if transform: 
+            if transform:
                 # transform to image coordinate space
                 vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
 
@@ -136,10 +139,10 @@ class SynergyNet(nn.Module):
 
     def forward(self, input, target):
         _3D_attr, _3D_attr_GT, avgpool = self.I2P(input, target)
-            
+
         vertex_lmk = self.reconstruct_vertex_62(_3D_attr, dense=False)
         vertex_GT_lmk = self.reconstruct_vertex_62(_3D_attr_GT, dense=False)
-        self.loss['loss_LMK_f0'] = 0.05 *self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)        
+        self.loss['loss_LMK_f0'] = 0.05 *self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)
         self.loss['loss_Param_In'] = 0.02 * self.ParamLoss(_3D_attr, _3D_attr_GT)
 
         """
