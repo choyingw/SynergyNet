@@ -1,86 +1,63 @@
-'''
-Deformable Convolution operator courtesy of: https://github.com/developer0hye/PyTorch-Deformable-Convolution-v2
-'''
-
 import torch
 import torchvision.ops
+from DefConv import DeformableConv2d
 from torch import nn
 
-class DeformableConv2d(nn.Module):
+class DefConvBNReLU(nn.Sequential):
+    def __init__(self, in_planes, out_planes, kernel_size=3, stride=1, groups=1, norm_layer=None):
+        padding = (kernel_size - 1) // 2
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+        super(DefConvBNReLU, self).__init__(
+            DeformableConv2d(in_planes, out_planes, kernel_size, stride, padding, False),
+            norm_layer(out_planes),
+            nn.ReLU6(inplace=True)
+        )
+
+class DeformableBackbone(nn.Module):
     def __init__(self,
-                 in_channels,
-                 out_channels,
-                 kernel_size=3,
-                 stride=1,
-                 padding=1,
-                 bias=False):
+                 num_classes=1000,
+                 width_mult=1.0,
+                 inverted_residual_setting=None,
+                 round_nearest=8,
+                 block=None,
+                 norm_layer=None):
+        """
+        MobileNet V2 main class
+        Args:
+            num_classes (int): Number of classes
+            width_mult (float): Width multiplier - adjusts number of channels in each layer by this amount
+            inverted_residual_setting: Network structure
+            round_nearest (int): Round the number of channels in each layer to be a multiple of this number
+            Set to 1 to turn off rounding
+            block: Module specifying inverted residual building block for mobilenet
+            norm_layer: Module specifying the normalization layer to use
+        """
+        super(DeformableBackbone, self).__init__()
 
-        super(DeformableConv2d, self).__init__()
-
-        assert type(kernel_size) == tuple or type(kernel_size) == int
-
-        kernel_size = kernel_size if type(kernel_size) == tuple else (kernel_size, kernel_size)
-        self.stride = stride if type(stride) == tuple else (stride, stride)
-        self.padding = padding
-
-        self.offset_conv = nn.Conv2d(in_channels,
-                                     2 * kernel_size[0] * kernel_size[1],
-                                     kernel_size=kernel_size,
-                                     stride=stride,
-                                     padding=self.padding,
-                                     bias=True)
-
-        nn.init.constant_(self.offset_conv.weight, 0.)
-        nn.init.constant_(self.offset_conv.bias, 0.)
-
-        self.regular_conv = nn.Conv2d(in_channels=in_channels,
-                                      out_channels=out_channels,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=self.padding,
-                                      bias=bias)
-
-    def forward(self, x):
-        #h, w = x.shape[2:]
-        #max_offset = max(h, w)/4.
-
-        offset = self.offset_conv(x)#.clamp(-max_offset, max_offset)
-        #modulator = 2. * torch.sigmoid(self.modulator_conv(x))
-
-        x = torchvision.ops.deform_conv2d(input=x,
-                                          offset=offset,
-                                          weight=self.regular_conv.weight,
-                                          bias=self.regular_conv.bias,
-                                          padding=self.padding,
-                                          stride=self.stride)
-        return x
-
-class DCNv1(nn.Module):
-    def __init__(self,
-                num_classes=1000,
-                width_mult=1.0,
-                inverted_residual_setting=None,
-                round_nearest=8,
-                block=None,
-                norm_layer=None):
-
-        super(DCNv1, self).__init__()
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
 
         input_channel = 32
-        input_channel = int(input_channel * width_mult)
-
-        features = [nn.Conv2d(3, input_channel, kernel_size=1, stride=2)]
-
         last_channel = 1280
-        self.last_channel = int(last_channel * max(1.0, width_mult))
 
-        features.append(nn.Conv2d(input_channel, self.last_channel, kernel_size=1))
-
+        # building first layer
+        self.last_channel = last_channel#_make_divisible(last_channel * max(1.0, width_mult), round_nearest)
+        features = [DefConvBNReLU(3, input_channel, stride=2, norm_layer=norm_layer)]
+        features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        # building last several layers
+        features.append(DefConvBNReLU(input_channel, self.last_channel, stride=2, norm_layer=norm_layer))
+        # make it nn.Sequential
         self.features = nn.Sequential(*features)
+
+        # building classifier
 
         self.num_ori = 12
         self.num_shape = 40
         self.num_exp = 10
+
 
         self.classifier_ori = nn.Sequential(
             nn.Dropout(0.2),
@@ -129,10 +106,14 @@ class DCNv1(nn.Module):
     def forward(self, x):
         return self._forward_impl(x)
 
+
 def dcnv1(pretrained=False, progress=True, **kwargs):
-    model = DCNv1(**kwargs)
-    # if pretrained:
-    #     state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'],
-    #                                           progress=progress)
-    #     model.load_state_dict(state_dict, strict=False)
+    """
+    Constructs a MobileNetV2 architecture from
+    `"MobileNetV2: Inverted Residuals and Linear Bottlenecks" <https://arxiv.org/abs/1801.04381>`_.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+    """
+    model = DeformableBackbone(**kwargs)
     return model

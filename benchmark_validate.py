@@ -178,7 +178,7 @@ def benchmark_aflw2000_params(params, data_param):
     Reconstruct the landmark points and calculate the statistics
     """
     outputs = []
-    params = torch.Tensor(params)#.cuda()
+    params = torch.Tensor(params).cuda()
 
     batch_size = 50
     num_samples = params.shape[0]

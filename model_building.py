@@ -46,14 +46,13 @@ class I2P(nn.Module):
             self.backbone = getattr(dcnv2, args.arch)(pretrained=False)
         elif 'dcnv1' in self.args.arch:
             self.backbone = getattr(dcnv1, args.arch)(pretrained=False)
-            print(self.backbone);raise
         else:
             raise RuntimeError("Please choose [mobilenet_v2, mobilenet_1, resnet50, ghostnet, dcnv1, or dcnv2]")
 
     def forward(self,input, target):
         """Training time forward"""
         _3D_attr, avgpool = self.backbone(input)
-        _3D_attr_GT = target.type(torch.cuda.FloatTensor)
+        _3D_attr_GT = target.type(torch.FloatTensor).cuda.FloatTensor)
         return _3D_attr, _3D_attr_GT, avgpool
 
     def forward_test(self, input):
