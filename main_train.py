@@ -115,11 +115,11 @@ def train(train_loader, model, optimizer, epoch, lr):
     end = time.time()
     for i, (input, target) in enumerate(train_loader):
 
-        input = input#.cuda(non_blocking=True)
+        input = input.cuda(non_blocking=True)
 
         target = target[:,:62]
         target.requires_grad = False
-        target = target.float()#.cuda(non_blocking=True)
+        target = target.float().cuda(non_blocking=True)
 
         losses = model(input, target)
 
@@ -175,9 +175,9 @@ def main():
 
     # step1: define the model structure
     model = SynergyNet(args)
-    #torch.cuda.set_device(args.devices_id[0])
+    torch.cuda.set_device(args.devices_id[0])
 
-    model = nn.DataParallel(model, device_ids=args.devices_id)#.cuda()  # -> GPU
+    model = nn.DataParallel(model, device_ids=args.devices_id).cuda()  # -> GPU
 
     # step2: optimization: loss and optimization method
 
