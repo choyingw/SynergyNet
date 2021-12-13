@@ -46,6 +46,7 @@ class I2P(nn.Module):
             self.backbone = getattr(dcnv2, args.arch)(pretrained=False)
         elif 'dcnv1' in self.args.arch:
             self.backbone = getattr(dcnv1, args.arch)(pretrained=False)
+            print(self.backbone);raise
         else:
             raise RuntimeError("Please choose [mobilenet_v2, mobilenet_1, resnet50, ghostnet, dcnv1, or dcnv2]")
 

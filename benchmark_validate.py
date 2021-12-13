@@ -123,6 +123,7 @@ def reconstruct_vertex(param, data_param, whitening=True, dense=False, transform
 
     if whitening:
         if param.shape[1] == 62:
+            param = param.cuda()
             param = param * param_std[:62] + param_mean[:62]
 
     p, offset, alpha_shp, alpha_exp = parse_param_62_batch(param)
@@ -152,7 +153,7 @@ def extract_param(model, root='', filelists=None,
     outputs = []
     with torch.no_grad():
         for _, inputs in enumerate(data_loader):
-            inputs = inputs#.cuda()
+            inputs = inputs.cuda()
             output = model.module.forward_test(inputs)
 
             for i in range(output.shape[0]):

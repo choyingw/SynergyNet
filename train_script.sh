@@ -6,7 +6,7 @@ mkdir -p ${LOG_DIR}
 
 LOG_FILE="${LOG_DIR}/`date +'%Y-%m-%d_%H:%M.%S'`.log"
 
-python3 main_train.py --arch="dcnv1" \
+python3 main_train.py \
     --start-epoch=1 \
     --snapshot="ckpts/SynergyNet" \
     --param-fp-train='./3dmm_data/param_all_norm_v201.pkl' \
@@ -24,4 +24,7 @@ python3 main_train.py --arch="dcnv1" \
     --save_val_freq=5 \
     --resume="" \
     --batch-size=16 \
-    --snapshot="ckpts/baseline_SynergyNet" \
+    --arch="dcnv1" \
+    --arch="dcnv2" \
+    --snapshot="ckpts/dcnv1_SynergyNet" \
+    --snapshot="ckpts/dcnv2_SynergyNet" \
