@@ -34,7 +34,7 @@ def parse_pose(param):
     return P, pose
 
 def P2sRt(P):
-    '''decomposing camera matrix P'''   
+    '''decomposing camera matrix P'''
     t3d = P[:, 3]
     R1 = P[0:1, :3]
     R2 = P[1:2, :3]
@@ -60,7 +60,7 @@ def matrix2angle(R):
         else:
             x = -np.pi / 2
             y = -z + atan2(-R[0, 1], -R[0, 2])
-    
+
     rx, ry, rz = x*180/np.pi, y*180/np.pi, z*180/np.pi
 
     return [rx, ry, rz]
@@ -98,18 +98,18 @@ def reconstruct_vertex(param, data_param, whitening=True, transform=True, lmk_pt
 
 def extract_param(checkpoint_fp, root='', args=None, filelists=None, device_ids=[0],
                   batch_size=128, num_workers=4):
-    map_location = {'cuda:{}'.format(i): 'cuda:0' for i in range(8)}
+    map_location = 'cpu'#{'cuda:{}'.format(i): 'cuda:0' for i in range(8)}
     checkpoint = torch.load(checkpoint_fp, map_location=map_location)['state_dict']
-    
+
     # Need to take off these for different numbers of base landmark points
     # del checkpoint['module.u_base']
     # del checkpoint['module.w_shp_base']
     # del checkpoint['module.w_exp_base']
 
-    torch.cuda.set_device(device_ids[0])
+    #torch.cuda.set_device(device_ids[0])
 
     model = SynergyNet(args)
-    model = nn.DataParallel(model, device_ids=device_ids).cuda()
+    model = nn.DataParallel(model, device_ids=device_ids)#.cuda()
     model.load_state_dict(checkpoint, strict=False)
 
     dataset = DDFATestDataset(filelists=filelists, root=root,
@@ -123,7 +123,7 @@ def extract_param(checkpoint_fp, root='', args=None, filelists=None, device_ids=
     outputs = []
     with torch.no_grad():
         for _, inputs in enumerate(data_loader):
-            inputs = inputs.cuda()
+            inputs = inputs#.cuda()
             output = model.module.forward_test(inputs)
 
             for i in range(output.shape[0]):
@@ -145,7 +145,7 @@ img_list = sorted(glob.glob('./aflw2000_data/AFLW2000-3D_crop/*.jpg'))
 def benchmark_aflw2000_params(params, data_param):
     '''Reconstruct the landmark points and calculate the statistics'''
     outputs = []
-    params = torch.Tensor(params).cuda()
+    params = torch.Tensor(params)#.cuda()
 
     batch_size = 50
     num_samples = params.shape[0]
@@ -192,7 +192,7 @@ def benchmark_FOE(params):
     if not os.path.isfile(exclude_aflw2000) or not os.path.isfile(skip_aflw2000):
         raise RuntimeError('Missing data')
 
-    pose_GT = np.load(exclude_aflw2000) 
+    pose_GT = np.load(exclude_aflw2000)
     skip_indices = np.load(skip_aflw2000)
     pose_mat = np.ones((pose_GT.shape[0],3))
 

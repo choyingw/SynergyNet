@@ -4,7 +4,7 @@ import os
 import os.path as osp
 from pathlib import Path
 import numpy as np
-import argparse 
+import argparse
 import time
 import logging
 
@@ -118,10 +118,14 @@ def train(train_loader, model, optimizer, epoch, lr):
         input = input.cuda(non_blocking=True)
 
         target = target[:,:62]
-        target.requires_grad = False  
+        target.requires_grad = False
         target = target.float().cuda(non_blocking=True)
-        
+
         losses = model(input, target)
+
+        #print(losses)
+
+        #ok, so already at this point losses is incorrect
 
         data_time.update(time.time() - end)
 
@@ -132,7 +136,7 @@ def train(train_loader, model, optimizer, epoch, lr):
             loss_total += mean_loss
 
         losses_meter[j+1].update(loss_total, input.size(0))
-        
+
         ### compute gradient and do SGD step
         optimizer.zero_grad()
         loss_total.backward()
@@ -189,7 +193,7 @@ def main():
             logging.info(f'=> loading checkpoint {args.resume}')
             checkpoint = torch.load(args.resume, map_location=lambda storage, loc: storage)['state_dict']
             model.load_state_dict(checkpoint, strict=False)
-            
+
         else:
             logging.info(f'=> no checkpoint found at {args.resume}')
 
@@ -207,13 +211,13 @@ def main():
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.workers,
                               shuffle=True, pin_memory=True, drop_last=True)
 
-    
+
     # step4: run
     cudnn.benchmark = True
     if args.test_initial: # if testing the performance from the initial
         logging.info('Testing from initial')
         benchmark_pipeline(model)
-        
+
 
     for epoch in range(args.start_epoch, args.epochs + 1):
         # adjust learning rate

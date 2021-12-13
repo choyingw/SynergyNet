@@ -37,7 +37,7 @@ def parse_pose(param):
     return P, pose
 
 def P2sRt(P):
-    ''' 
+    '''
     Decompositing camera matrix P.
     '''
     t3d = P[:, 3]
@@ -52,7 +52,7 @@ def P2sRt(P):
     return s, R, t3d
 
 # def matrix2angle(R):
-#     ''' 
+#     '''
 #     Compute three Euler angles from a Rotation Matrix. Ref: http://www.gregslabaugh.net/publications/euler.pdf
 #     '''
 
@@ -69,14 +69,14 @@ def P2sRt(P):
 #         else:
 #             x = -np.pi / 2
 #             y = -z + atan2(-R[0, 1], -R[0, 2])
-    
+
 #     rx, ry, rz = x*180/np.pi, y*180/np.pi, z*180/np.pi
 
 #     return [rx, ry, rz]
 
 #numpy
 def matrix2angle_corr(R):
-    ''' 
+    '''
     Compute three Euler angles from a Rotation Matrix. Ref: http://www.gregslabaugh.net/publications/euler.pdf
     '''
 
@@ -93,7 +93,7 @@ def matrix2angle_corr(R):
         else:
             x = -np.pi / 2
             y = -z + atan2(-R[0, 1], -R[0, 2])
-    
+
     rx, ry, rz = x*180/np.pi, y*180/np.pi, z*180/np.pi
 
     return [rx, ry, rz]
@@ -123,6 +123,7 @@ def reconstruct_vertex(param, data_param, whitening=True, dense=False, transform
 
     if whitening:
         if param.shape[1] == 62:
+            param = param.cuda()
             param = param * param_std[:62] + param_mean[:62]
 
     p, offset, alpha_shp, alpha_exp = parse_param_62_batch(param)
@@ -140,7 +141,7 @@ def reconstruct_vertex(param, data_param, whitening=True, dense=False, transform
 
 def extract_param(model, root='', filelists=None,
                   batch_size=128, num_workers=4):
-    
+
     dataset = DDFATestDataset(filelists=filelists, root=root,
                               transform=transforms.Compose([ToTensor(), CenterCrop(5, mode='test'), Normalize(mean=127.5, std=130)]))
     data_loader = data.DataLoader(dataset, batch_size=batch_size, num_workers=num_workers)
