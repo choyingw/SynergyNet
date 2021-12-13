@@ -47,6 +47,8 @@ class DeformableBackbone(nn.Module):
         features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
         features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
         features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DefConvBNReLU(input_channel, input_channel, stride=2, norm_layer=norm_layer))
         # building last several layers
         features.append(DefConvBNReLU(input_channel, self.last_channel, stride=2, norm_layer=norm_layer))
         # make it nn.Sequential
