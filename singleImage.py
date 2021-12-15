@@ -19,8 +19,8 @@ IMG_SIZE = 120
 
 def main(args):
     # load pre-tained model
-    checkpoint_fp = 'ckpts/dcnv1_SynergyNet_checkpoint_epoch_50.pth.tar' 
-    args.arch = 'dcnv1'
+    checkpoint_fp = 'pretrained/best.pth.tar' 
+    args.arch = 'mobilenet_v2'
     args.devices_id = [0]
 
     checkpoint = torch.load(checkpoint_fp, map_location=lambda storage, loc: storage)['state_dict']
@@ -95,28 +95,28 @@ def main(args):
             vertices_lst.append(vertices)
             poses.append([angles, translation, lmks])
 
-        if not osp.exists(f'inference_output/rendering_overlay/'):
-            os.makedirs(f'inference_output/rendering_overlay/')
-        if not osp.exists(f'inference_output/landmarks/'):
-            os.makedirs(f'inference_output/landmarks/')
-        if not osp.exists(f'inference_output/poses/'):
-            os.makedirs(f'inference_output/poses/')
+        if not osp.exists(f'inference_output_baseline/rendering_overlay/'):
+            os.makedirs(f'inference_output_baseline/rendering_overlay/')
+        if not osp.exists(f'inference_output_baseline/landmarks/'):
+            os.makedirs(f'inference_output_baseline/landmarks/')
+        if not osp.exists(f'inference_output_baseline/poses/'):
+            os.makedirs(f'inference_output_baseline/poses/')
         
         name = img_fp.rsplit('/',1)[-1][:-4]
         img_ori_copy = img_ori.copy()
 
         # mesh
-        render(img_ori, vertices_lst, alpha=0.6, wfp=f'inference_output/rendering_overlay/{name}.jpg')
+        render(img_ori, vertices_lst, alpha=0.6, wfp=f'inference_output_baseline/rendering_overlay/{name}.jpg')
         
         # landmarks
-        draw_landmarks(img_ori_copy, pts_res, wfp=f'inference_output/landmarks/{name}.jpg')
+        draw_landmarks(img_ori_copy, pts_res, wfp=f'inference_output_baseline/landmarks/{name}.jpg')
         
         # face orientation
         img_axis_plot = img_ori_copy
         for angles, translation, lmks in poses:
             img_axis_plot = draw_axis(img_axis_plot, angles[0], angles[1],
                 angles[2], translation[0], translation[1], size = 50, pts68=lmks)
-        wfp = f'inference_output/poses/{name}.jpg'
+        wfp = f'inference_output_baseline/poses/{name}.jpg'
         cv2.imwrite(wfp, img_axis_plot)
         print(f'Save pose result to {wfp}')
 
