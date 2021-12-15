@@ -16,33 +16,33 @@ class DeformableConv2d(nn.Module):
                  bias=False):
 
         super(DeformableConv2d, self).__init__()
-
+        
         assert type(kernel_size) == tuple or type(kernel_size) == int
 
         kernel_size = kernel_size if type(kernel_size) == tuple else (kernel_size, kernel_size)
         self.stride = stride if type(stride) == tuple else (stride, stride)
         self.padding = padding
-
-        self.offset_conv = nn.Conv2d(in_channels,
+        
+        self.offset_conv = nn.Conv2d(in_channels, 
                                      2 * kernel_size[0] * kernel_size[1],
-                                     kernel_size=kernel_size,
+                                     kernel_size=kernel_size, 
                                      stride=stride,
-                                     padding=self.padding,
+                                     padding=self.padding, 
                                      bias=True)
 
         nn.init.constant_(self.offset_conv.weight, 0.)
         nn.init.constant_(self.offset_conv.bias, 0.)
-
-        self.modulator_conv = nn.Conv2d(in_channels,
-                                        1 * kernel_size[0] * kernel_size[1],
-                                        kernel_size=kernel_size,
-                                        stride=stride,
-                                        padding=self.padding,
-                                        bias=True)
+        
+        self.modulator_conv = nn.Conv2d(in_channels, 
+                                     1 * kernel_size[0] * kernel_size[1],
+                                     kernel_size=kernel_size, 
+                                     stride=stride,
+                                     padding=self.padding, 
+                                     bias=True)
 
         nn.init.constant_(self.modulator_conv.weight, 0.)
         nn.init.constant_(self.modulator_conv.bias, 0.)
-
+        
         self.regular_conv = nn.Conv2d(in_channels=in_channels,
                                       out_channels=out_channels,
                                       kernel_size=kernel_size,
@@ -56,11 +56,11 @@ class DeformableConv2d(nn.Module):
 
         offset = self.offset_conv(x)#.clamp(-max_offset, max_offset)
         modulator = 2. * torch.sigmoid(self.modulator_conv(x))
-
-        x = torchvision.ops.deform_conv2d(input=x,
-                                          offset=offset,
-                                          weight=self.regular_conv.weight,
-                                          bias=self.regular_conv.bias,
+        
+        x = torchvision.ops.deform_conv2d(input=x, 
+                                          offset=offset, 
+                                          weight=self.regular_conv.weight, 
+                                          bias=self.regular_conv.bias, 
                                           padding=self.padding,
                                           mask=modulator,
                                           stride=self.stride)
@@ -77,21 +77,31 @@ class DCNv2(nn.Module):
 
         super(DCNv2, self).__init__()
 
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+
         input_channel = 32
-        input_channel = int(input_channel * width_mult)
-
-        features = [nn.Conv2d(3, input_channel, kernel_size=1, stride=2)]
-
         last_channel = 1280
-        self.last_channel = int(last_channel * max(1.0, width_mult))
 
-        features.append(nn.Conv2d(input_channel, self.last_channel, kernel_size=1))
-
+        # building first layer
+        self.last_channel = last_channel#_make_divisible(last_channel * max(1.0, width_mult), round_nearest)
+        features = [DeformableConv2d(3, input_channel, stride=2, norm_layer=norm_layer)]
+        features.append(DeformableConv2d(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DeformableConv2d(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DeformableConv2d(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DeformableConv2d(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        features.append(DeformableConv2d(input_channel, input_channel, stride=2, norm_layer=norm_layer))
+        # building last several layers
+        features.append(DeformableConv2d(input_channel, self.last_channel, stride=2, norm_layer=norm_layer))
+        # make it nn.Sequential
         self.features = nn.Sequential(*features)
+
+        # building classifier
 
         self.num_ori = 12
         self.num_shape = 40
         self.num_exp = 10
+
 
         self.classifier_ori = nn.Sequential(
             nn.Dropout(0.2),
@@ -142,8 +152,4 @@ class DCNv2(nn.Module):
 
 def dcnv2(pretrained=False, progress=True, **kwargs):
     model = DCNv2(**kwargs)
-    # if pretrained:
-    #     state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'],
-    #                                           progress=progress)
-    #     model.load_state_dict(state_dict, strict=False)
     return model
