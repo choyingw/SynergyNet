@@ -13,6 +13,7 @@ from benchmark_aflw2000 import ana_msg as ana_alfw2000
 
 import argparse
 import os
+import os.path as osp
 import glob
 import math
 from math import cos, atan2, asin
@@ -213,6 +214,16 @@ def benchmark_FOE(params):
     msg = 'Mean MAE = %3.3f (in deg), [yaw,pitch,roll] = [%3.3f, %3.3f, %3.3f]'%(MAE, yaw, pitch, roll)
     print('\nFace orientation estimation:')
     print(msg)
+    
+    # Write mean MAE results to file
+    if not osp.exists(f"MAE_results"):
+        os.makedirs(f'MAE_results/')
+    
+    if not osp.exists(f'MAE_results/mobilenet_MAE.txt'):
+        with open('MAE_results/mobilenet_MAE.txt', 'w') as f:
+            f.write(msg)
+    
+    
     return msg
 
 def benchmark(checkpoint_fp, args):
@@ -243,7 +254,7 @@ def benchmark(checkpoint_fp, args):
 def main():
     parser = argparse.ArgumentParser(description='SynergyNet benchmark on AFLW2000-3D')
     parser.add_argument('-a', '--arch', default='mobilenet_v2', type=str)
-    parser.add_argument('-w', '--weights', default='models/best.pth.tar', type=str)
+    parser.add_argument('-w', '--weights', default='pretrained/best.pth.tar', type=str)
     parser.add_argument('-d', '--device', default='0', type=str)
     parser.add_argument('--img_size', default='120', type=int)
     args = parser.parse_args()

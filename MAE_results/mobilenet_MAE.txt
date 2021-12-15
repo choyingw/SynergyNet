@@ -1,0 +1,1 @@
+Mean MAE = 3.388 (in deg), [yaw,pitch,roll] = [3.566, 4.059, 2.539]
