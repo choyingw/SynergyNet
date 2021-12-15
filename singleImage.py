@@ -19,8 +19,8 @@ IMG_SIZE = 120
 
 def main(args):
     # load pre-tained model
-    checkpoint_fp = 'pretrained/best.pth.tar' 
-    args.arch = 'mobilenet_v2'
+    checkpoint_fp = 'ckpts/dcnv1_SynergyNet_checkpoint_epoch_50.pth.tar' 
+    args.arch = 'dcnv1'
     args.devices_id = [0]
 
     checkpoint = torch.load(checkpoint_fp, map_location=lambda storage, loc: storage)['state_dict']
@@ -33,7 +33,7 @@ def main(args):
         model_dict[k.replace('module.', '')] = checkpoint[k]
 
     model.load_state_dict(model_dict, strict=False)
-    model = model.cuda()
+    model = model#.cuda()
     model.eval()
 
     # face detector
@@ -82,7 +82,7 @@ def main(args):
             
             input = transform(img).unsqueeze(0)
             with torch.no_grad():
-                input = input.cuda()
+                input = input#.cuda()
                 param = model.forward_test(input)
                 param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
@@ -128,6 +128,8 @@ if __name__ == '__main__':
     parser.add_argument('--img_size', default=120, type=int)
     parser.add_argument('-b', '--batch-size', default=1, type=int)
     parser.add_argument('-num_img', '--num_img', default=None, type=int)
+    # Add additional args to extend render script
+
 
     args = parser.parse_args()
     main(args)

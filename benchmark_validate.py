@@ -273,6 +273,11 @@ def main():
     parser.add_argument('-c', '--checkpoint-fp', default='models/phase1_wpdc.pth.tar', type=str)
     args = parser.parse_args()
 
+    print(args.arch)
+    print(args.checkpoint_fp)
+
+
+
     benchmark_pipeline(args.arch, args.checkpoint_fp)
 
 

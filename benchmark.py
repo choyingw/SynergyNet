@@ -169,8 +169,8 @@ def benchmark_aflw2000_params(params, data_param):
                     #plot the first 50 samples for validation
                     bkg = cv2.imread(img_list[i*batch_size+j],-1)
                     lm_sample = lm[j]
-                    c0 = np.clip((lm_sample[1,:]).astype(np.int), 0, 119)
-                    c1 = np.clip((lm_sample[0,:]).astype(np.int), 0, 119)
+                    c0 = np.clip((lm_sample[1,:]).astype(int), 0, 119)
+                    c1 = np.clip((lm_sample[0,:]).astype(int), 0, 119)
                     for y, x, in zip([c0,c0,c0-1,c0-1],[c1,c1-1,c1,c1-1]):
                         bkg[y, x, :] = np.array([233,193,133])
                     cv2.imwrite(f'./results/{i*batch_size+j}.png', bkg)
