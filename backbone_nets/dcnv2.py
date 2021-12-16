@@ -77,22 +77,26 @@ class DCNv2(nn.Module):
 
         super(DCNv2, self).__init__()
 
-        if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
-
         input_channel = 32
         last_channel = 1280
 
         # building first layer
         self.last_channel = last_channel#_make_divisible(last_channel * max(1.0, width_mult), round_nearest)
-        features = [DeformableConv2d(3, input_channel, stride=2)]
+        features = [nn.Conv2d(3, input_channel, stride=2, kernel_size=3)]
+        features.append(nn.ReLU6())
+        features.append(nn.Conv2d(input_channel, input_channel, stride=2, kernel_size=3))
+        features.append(nn.ReLU6())
+        features.append(nn.Conv2d(input_channel, input_channel, stride=2, kernel_size=3))
+        features.append(nn.ReLU6())
+        features.append(nn.Conv2d(input_channel, input_channel, stride=2, kernel_size=3))
+        features.append(nn.ReLU6())
         features.append(DeformableConv2d(input_channel, input_channel, stride=2))
+        features.append(nn.ReLU6())
         features.append(DeformableConv2d(input_channel, input_channel, stride=2))
-        features.append(DeformableConv2d(input_channel, input_channel, stride=2))
-        features.append(DeformableConv2d(input_channel, input_channel, stride=2))
-        features.append(DeformableConv2d(input_channel, input_channel, stride=2))
+        features.append(nn.ReLU6())
         # building last several layers
-        features.append(DeformableConv2d(input_channel, self.last_channel, stride=2, norm_layer=norm_layer))
+        features.append(DeformableConv2d(input_channel, self.last_channel, stride=2))
+        features.append(nn.ReLU6())
         # make it nn.Sequential
         self.features = nn.Sequential(*features)
 
