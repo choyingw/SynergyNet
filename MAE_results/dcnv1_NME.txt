@@ -1,0 +1,5 @@
+Facial Alignment on AFLW2000-3D (NME):
+[ 0, 30]        Mean: 3.447, Std: 1.456
+[30, 60]        Mean: 4.192, Std: 2.255
+[60, 90]        Mean: 5.655, Std: 4.049
+[ 0, 90]        Mean: 4.431, Std: 0.917
