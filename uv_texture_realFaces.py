@@ -12,6 +12,8 @@ import os
 import os.path as osp
 import glob
 from FaceBoxes import FaceBoxes
+from utils.render import render
+
 
 # Following 3DDFA-V2, we also use 120x120 resolution
 IMG_SIZE = 120
@@ -77,44 +79,41 @@ def main(args):
         img_ori = cv2.imread(img_fp)
 
         # crop faces
-        rects = face_boxes(img_ori)
+        rect = [0,0,256,256,1.0] # pre-cropped faces
 
         # storage
         vertices_lst = []
-        for rect in rects:
-            roi_box = rect
+        roi_box = rect
+        img = crop_img(img_ori, roi_box)
+        img = cv2.resize(img, dsize=(IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_LINEAR)
+        
+        input = transform(img).unsqueeze(0)
+        with torch.no_grad():
+            input = input.cuda()
+            param = model.forward_test(input)
+            param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
 
-            # enlarge the bbox a little and do a square crop
-            HCenter = (rect[1] + rect[3])/2
-            WCenter = (rect[0] + rect[2])/2
-            side_len = roi_box[3]-roi_box[1]
-            margin = side_len * 1.2 // 2
-            roi_box[0], roi_box[1], roi_box[2], roi_box[3] = WCenter-margin, HCenter-margin, WCenter+margin, HCenter+margin
-
-            img = crop_img(img_ori, roi_box)
-            img = cv2.resize(img, dsize=(IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_LINEAR)
-            
-            input = transform(img).unsqueeze(0)
-            with torch.no_grad():
-                input = input.cuda()
-                param = model.forward_test(input)
-                param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
-
-            # dense pts
-            vertices = predict_denseVert(param, roi_box, transform=True)
-            vertices_lst.append(vertices)
+        # dense pts
+        vertices = predict_denseVert(param, roi_box, transform=True)
+        vertices = vertices[:,keep_ind]
+        vertices_lst.append(vertices)
 
         # textured obj file output
         if not osp.exists(f'inference_output/obj/'):
             os.makedirs(f'inference_output/obj/')
+        if not osp.exists(f'inference_output/rendering_overlay/'):
+            os.makedirs(f'inference_output/rendering_overlay/')
         
-        name = img_fp.rsplit('/',1)[-1][:-4] # drop off the extension
-        colors = cv2.imread(f'uv_art/{name}_fake_B.png',-1)
+        name = img_fp.rsplit('/',1)[-1][:-11] # drop off the postfix
+        colors = cv2.imread(f'texture_data/uv_real/{name}_fake_B.png',-1)
         colors = np.flip(colors,axis=0)
         colors_uv = (colors[coord_u, coord_v,:])
 
         wfp = f'inference_output/obj/{name}.obj'
-        write_obj_with_colors(wfp, vertices[:,keep_ind], tri_deletion, colors_uv[keep_ind,:].astype(np.float32))
+        write_obj_with_colors(wfp, vertices, tri_deletion, colors_uv[keep_ind,:].astype(np.float32))
+
+        tex = colors_uv[keep_ind,:].astype(np.float32)/255.0
+        render(img_ori, vertices_lst, alpha=0.6, wfp=f'inference_output/rendering_overlay/{name}.jpg', tex=tex, connectivity=tri_deletion-1)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

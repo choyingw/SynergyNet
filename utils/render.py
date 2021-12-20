@@ -18,11 +18,11 @@ tri = sio.loadmat('./3dmm_data/tri.mat')['tri'] - 1
 tri = _to_ctype(tri.T).astype(np.int32)
 
 cfg = {
-    'intensity_ambient': 0.3,
+    'intensity_ambient': 0.75,
     'color_ambient': (1, 1, 1),
-    'intensity_directional': 0.6,
+    'intensity_directional': 0.7,
     'color_directional': (1, 1, 1),
-    'intensity_specular': 0.1,
+    'intensity_specular': 0.2,
     'specular_exp': 5,
     'light_pos': (0, 0, 5),
     'view_pos': (0, 0, 5)
@@ -30,13 +30,16 @@ cfg = {
 
 render_app = RenderPipeline(**cfg)
 
-def render(img, ver_lst, alpha=0.6, wfp=None):
+def render(img, ver_lst, alpha=0.6, wfp=None, tex=None, connectivity=None):
     # save solid mesh rendering and alpha overlaying on images
+    if not connectivity is None:
+        tri = _to_ctype(connectivity.T).astype(np.int32)
+
     overlap = img.copy()
     for ver_ in ver_lst:
         ver_ = ver_.astype(np.float32)
         ver = _to_ctype(ver_.T)  # transpose
-        overlap = render_app(ver, tri, overlap)
+        overlap = render_app(ver, tri, overlap, texture=tex)
     cv2.imwrite(wfp[:-4]+'_solid'+'.png', overlap)
 
     res = cv2.addWeighted(img, 1 - alpha, overlap, alpha, 0)

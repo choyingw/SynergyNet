@@ -37,7 +37,7 @@ class RenderPipeline(object):
     def __call__(self, vertices, triangles, bg, texture=None):
         normal = get_normal(vertices, triangles)
 
-        # 2. lighting
+        # 1. lighting
         light = np.zeros_like(vertices, dtype=np.float32)
         # ambient component
         if self.intensity_ambient > 0:

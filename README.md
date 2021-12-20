@@ -93,12 +93,26 @@ Print-out results and visualization under 'results/' (see 'demo/' for some sampl
 
 1. Follow Single Image Inference Demo: Step 1-5.
 
-2. Download artistic faces data [<a href="https://drive.google.com/file/d/1yYR5aqSCUGnggjhTbwU4vEwHxV1xq9ko/view?usp=sharing">here</a>], which are from [<a href="https://faculty.idc.ac.il/arik/site/foa/artistic-faces-dataset.asp">AF-Dataset</a>]. Download our inferred UV maps [<a href="https://drive.google.com/file/d/1TWJiitXAfZD_AwoJLw58XBPgOdanqgcG/view?usp=sharing">here</a>] by UV-texture GAN. Extract them under the root folder.
+2. Download artistic faces data [<a href="https://drive.google.com/file/d/1yYR5aqSCUGnggjhTbwU4vEwHxV1xq9ko/view?usp=sharing">here</a>], which are from [<a href="https://faculty.idc.ac.il/arik/site/foa/artistic-faces-dataset.asp">AF-Dataset</a>]. Download our predicted UV maps [<a href="https://drive.google.com/file/d/1TWJiitXAfZD_AwoJLw58XBPgOdanqgcG/view?usp=sharing">here</a>] by UV-texture GAN. Extract them under the root folder.
 
 3.
-    ```python artistic.py -f art-all/122.png```
+    ```python artistic.py -f art-all --png```(whole folder)
+    ```python artistic.py -f art-all/122.png```(single image)
+    
 
-Note that this artistic face dataset contains many different level/style face abstration. If a testing image is close to real, the result is much better than those of highly abstract samples.  
+Note that this artistic face dataset contains many different level/style face abstration. If a testing image is close to real, the result is much better than those of highly abstract samples. 
+
+## <div align="center">Textured Real Face Renderings</div>
+
+1. Follow Single Image Inference Demo: Step 1-5.
+
+2. Download our predicted UV maps and real face images for AFLW2000-3D [<a href="https://drive.google.com/file/d/12QCzkzBCKIEA3DSn6Kx5seeCeoUXKISc/view?usp=sharing">here</a>] by UV-texture GAN. Extract them under the root folder.
+
+3.
+    ```python uv_texture_realFaces.py -f texture_data/real --png``` (whole folder)
+    ```python uv_texture_realFaces.py -f texture_data/real/image00002_real_A.png``` (single image) 
+
+The results (mesh and renderings) are stored under 'inference_output'
 
 ## <div align="center">More Results</div>
 
