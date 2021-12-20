@@ -99,6 +99,7 @@ Update 12/14/2021: Best head pose estimation [<a href="https://drive.google.com/
 
 3.
     ```python artistic.py -f art-all --png```(whole folder)
+    
     ```python artistic.py -f art-all/122.png```(single image)
     
 
@@ -112,6 +113,7 @@ Note that this artistic face dataset contains many different level/style face ab
 
 3.
     ```python uv_texture_realFaces.py -f texture_data/real --png``` (whole folder)
+
     ```python uv_texture_realFaces.py -f texture_data/real/image00002_real_A.png``` (single image) 
 
 The results (3D meshes and renderings) are stored under 'inference_output'
