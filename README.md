@@ -76,7 +76,9 @@ Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX
 
     ```python benchmark.py -w pretrained/best.pth.tar```
 
-Print-out results and visualization under 'results/' (see 'demo/' for some sample references) are shown.
+Print-out results and visualization fo first-50 examples are stored under 'results/' (see 'demo/' for some pre-generated samples as references) are shown.
+
+Update 12/14/2021: Best head pose estimation [<a href="https://drive.google.com/file/d/13LagnHnPvBjWoQwkR3p7egYC6_MVtmG0/view?usp=sharing">pretrained model</a>] that comforms to the one reported in the paper. Use -w to load different pretrained models.
 
 ## <div align="center">Training</div>
 
@@ -138,6 +140,17 @@ Results on artistic faces:
 **Related Project**
 
 [<a href="https://github.com/choyingw/Voice2Mesh">Voice2Mesh</a>] (analysis on relation for voice and 3D face)
+
+**Bibtex**
+
+If you find our work useful, please consider to cite our work 
+
+    @INPROCEEDINGS{wu2021synergy,
+      author={Wu, Cho-Ying and Xu, Qiangeng and Neumann, Ulrich},
+      booktitle={2021 International Conference on 3D Vision (3DV)}, 
+      title={Synergy between 3DMM and 3D Landmarks for Accurate 3D Facial Geometry}, 
+      year={2021}
+      }
 
 **Acknowledgement**
 
