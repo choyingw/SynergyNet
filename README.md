@@ -112,7 +112,7 @@ Note that this artistic face dataset contains many different level/style face ab
     ```python uv_texture_realFaces.py -f texture_data/real --png``` (whole folder)
     ```python uv_texture_realFaces.py -f texture_data/real/image00002_real_A.png``` (single image) 
 
-The results (mesh and renderings) are stored under 'inference_output'
+The results (3D meshes and renderings) are stored under 'inference_output'
 
 ## <div align="center">More Results</div>
 
