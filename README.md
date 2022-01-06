@@ -25,7 +25,7 @@ This paper supersedes the previous version of M3-LRN.
 :+1: Fast inference with 3000fps on a laptop RTX 2080.<br><br>
 :+1: Simple implementation with only widely used operations.<br><br>
 
-(This project is built/tested on Python 3.8 and PyTorch 1.9)
+(This project is built/tested on Python 3.8 and PyTorch 1.9 on a compatible GPU)
 
 ## <div align="center"> Single Image Inference Demo</div>
 
@@ -43,7 +43,7 @@ This paper supersedes the previous version of M3-LRN.
 
 3. Install pre-requisite common packages
 
-    ```PyTorch 1.9 (should also be compatiable with 1.0+ versions), Opencv, Scipy, Matplotlib ```
+    ```PyTorch 1.9 (should also be compatiable with 1.0+ versions), Torchvision, Opencv, Scipy, Matplotlib, Cython ```
 
 4. Download data [<a href="https://drive.google.com/file/d/1YVBRcXmCeO1t5Bepv67KVr_QKcOur3Yy/view?usp=sharing">here</a>] and
 [<a href="https://drive.google.com/file/d/1SQsMhvAmpD1O8Hm0yEGom0C0rXtA0qs8/view?usp=sharing">here</a>]. Extract these data under the repo root.
@@ -64,9 +64,11 @@ Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX
 
     ```cd ..```
 
-5. Inference
+6. Inference
 
     ```python singleImage.py -f img```
+
+The default inference requires a compatible GPU to run. If you would like to run on a CPU, please comment the .cuda() and load the pretrained weights into cpu.
 
 ## <div align="center">Benchmark Evaluation</div>
 
