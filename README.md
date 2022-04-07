@@ -11,6 +11,8 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 
 This paper supersedes the previous version of M3-LRN.
 
+News: Our new work [<a href="https://github.com/choyingw/Voice2Mesh">Cross-Modal Perceptionist</a>] is accepted to CVPR22, which is based on this SynergyNet project.<br>
+
 <img src='demo/demo.gif'>
 
 <img src='demo/teaser.png'>
@@ -143,7 +145,7 @@ Results on artistic faces:
 
 **Related Project**
 
-[<a href="https://github.com/choyingw/Voice2Mesh">Voice2Mesh</a>] (analysis on relation for voice and 3D face)
+[<a href="https://github.com/choyingw/Voice2Mesh">Cross-Modal Perceptionist</a>] (analysis on relation for voice and 3D face)
 
 **Bibtex**
 
