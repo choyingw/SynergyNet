@@ -82,7 +82,7 @@ The default inference requires a compatible GPU to run. If you would like to run
 
 Print-out results and visualization fo first-50 examples are stored under 'results/' (see 'demo/' for some pre-generated samples as references) are shown.
 
-Update 12/14/2021: Best head pose estimation [<a href="https://drive.google.com/file/d/13LagnHnPvBjWoQwkR3p7egYC6_MVtmG0/view?usp=sharing">pretrained model</a>] that comforms to the one reported in the paper. Use -w to load different pretrained models.
+Updates: Best head pose estimation [<a href="https://drive.google.com/file/d/1XN74PIMWDue1UNJuDJd16BH8fvZpfwDp/view?usp=sharing">pretrained model</a>]  (Mean MAE: 3.31) that is better than number reported in paper (3.35). Use -w to load different pretrained models.
 
 ## <div align="center">Training</div>
 
