@@ -10,7 +10,7 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 [<a href="https://arxiv.org/abs/2110.09772">paper</a>] [<a href="https://youtu.be/i1Y8U2Z20ko">video</a>] [<a href="https://choyingw.github.io/works/SynergyNet/index.html">project page</a>]
 
 News: Add Colab demo 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1q9HRLA3wGxz4IFIseZFK1maOyH0wutYk)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1q9HRLA3wGxz4IFIseZFK1maOyH0wutYk?usp=sharing)
 
 News: Our new work [<a href="https://github.com/choyingw/Voice2Mesh">Cross-Modal Perceptionist</a>] is accepted to CVPR 2022, which is based on this SynergyNet project.<br>
 
