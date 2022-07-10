@@ -9,7 +9,7 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 
 [<a href="https://arxiv.org/abs/2110.09772">paper</a>] [<a href="https://youtu.be/i1Y8U2Z20ko">video</a>] [<a href="https://choyingw.github.io/works/SynergyNet/index.html">project page</a>]
 
-News [Jul 10, 2022]: Add simplified api for getting 3d landmarks, face mesh, and face pose in only one line. See "Simplified API" It's convenient if you want to plug in this method in your work.
+News [Jul 10, 2022]: Add simplified api for getting 3d landmarks, face mesh, and face pose in only one line. See "Simplified API" It's convenient if you simply want to plug in this method in your work.
 
 News: Add Colab demo 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1q9HRLA3wGxz4IFIseZFK1maOyH0wutYk?usp=sharing)
