@@ -9,6 +9,8 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 
 [<a href="https://arxiv.org/abs/2110.09772">paper</a>] [<a href="https://youtu.be/i1Y8U2Z20ko">video</a>] [<a href="https://choyingw.github.io/works/SynergyNet/index.html">project page</a>]
 
+News [Jul 10, 2022]: Add simplified api for getting 3d landmarks, face mesh, and face pose in only one line. See "Simplified API" It's convenient if you want to plug in this method in your work.
+
 News: Add Colab demo 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1q9HRLA3wGxz4IFIseZFK1maOyH0wutYk?usp=sharing)
 
@@ -72,6 +74,22 @@ Download pretrained weights [<a href="https://drive.google.com/file/d/1BVHbiLTfX
     ```python singleImage.py -f img```
 
 The default inference requires a compatible GPU to run. If you would like to run on a CPU, please comment the .cuda() and load the pretrained weights into cpu.
+
+## <div align="center"> Simplified API</div>
+
+We provide a simple API for convenient usage if you want to plug in this method into your work.
+
+```python
+import cv2
+from synergy3DMM import SynergyNet
+model = SynergyNet()
+I = cv2.imread(<your image path>)
+# get landmark [[y, x, z], 68 (points)], mesh [[y, x, z], 53215 (points)], and face pose (Euler angles [yaw, pitch, roll] and translation [y, x, z])
+lmk3d, mesh, pose = model.get_all_outputs(I)
+```
+We provide a simple script in singleImage_simple.py
+
+We also provide a setup.py file. Run <code>pip install -e . </code> You can do <code>from synergy3DMM import SynergyNet</code> in other directory. Note that [<a href="https://drive.google.com/file/d/1SQsMhvAmpD1O8Hm0yEGom0C0rXtA0qs8/view?usp=sharing">3dmm_data</a>] and [<a href="https://drive.google.com/file/d/1BVHbiLTfX6iTeJcNbh-jgHjWDoemfrzG/view?usp=sharing">pretrained weight</a>] (Put the model under 'pretrained/') need to be present.
 
 ## <div align="center">Benchmark Evaluation</div>
 

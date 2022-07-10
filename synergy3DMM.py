@@ -13,6 +13,7 @@ from backbone_nets import mobilenetv1_backbone
 from backbone_nets import mobilenetv2_backbone
 from backbone_nets import ghostnet_backbone
 from backbone_nets.pointnet_backbone import MLP_for, MLP_rev
+import loss_definition
 from loss_definition import ParamLoss, WingLoss
 
 from backbone_nets.ResNeSt import resnest50, resnest101
@@ -21,6 +22,10 @@ from utils.inference import predict_sparseVert, predict_denseVert, predict_pose,
 from FaceBoxes import FaceBoxes
 import cv2
 import types
+import os
+
+prefix_path = os.path.abspath(loss_definition.__file__).rsplit('/',1)[0]
+print(prefix_path)
 
 def parse_param_62(param):
 	"""Work for only tensor"""
@@ -60,120 +65,16 @@ class I2P(nn.Module):
 		""" Testing time forward."""
 		_3D_attr, avgpool = self.backbone(input)
 		return _3D_attr, avgpool
-
+        
 # Main model SynergyNet definition
 class SynergyNet(nn.Module):
-	def __init__(self, args):
-		super(SynergyNet, self).__init__()
-		self.triangles = sio.loadmat('./3dmm_data/tri.mat')['tri'] -1
-		self.triangles = torch.Tensor(self.triangles.astype(np.int)).long().cuda()
-		self.img_size = args.img_size
-		# Image-to-parameter
-		self.I2P = I2P(args)
-		# Forward
-		self.forwardDirection = MLP_for(68)
-		# Reverse
-		self.reverseDirection = MLP_rev(68)
-		self.LMKLoss_3D = WingLoss()
-		self.ParamLoss = ParamLoss()
-		
-		self.loss = {'loss_LMK_f0':0.0,
-					'loss_LMK_pointNet': 0.0,
-					'loss_Param_In':0.0,
-					'loss_Param_S2': 0.0,
-					'loss_Param_S1S2': 0.0,
-					}
-
-		self.register_buffer('param_mean', torch.Tensor(param_pack.param_mean).cuda(non_blocking=True))
-		self.register_buffer('param_std', torch.Tensor(param_pack.param_std).cuda(non_blocking=True))
-		self.register_buffer('w_shp', torch.Tensor(param_pack.w_shp).cuda(non_blocking=True))
-		self.register_buffer('u', torch.Tensor(param_pack.u).cuda(non_blocking=True))
-		self.register_buffer('w_exp', torch.Tensor(param_pack.w_exp).cuda(non_blocking=True))
-
-		# If doing only offline evaluation, use these
-		# self.u_base = torch.Tensor(param_pack.u_base).cuda(non_blocking=True)
-		# self.w_shp_base = torch.Tensor(param_pack.w_shp_base).cuda(non_blocking=True)
-		# self.w_exp_base = torch.Tensor(param_pack.w_exp_base).cuda(non_blocking=True)
-
-		# Online training needs these to parallel
-		self.register_buffer('u_base', torch.Tensor(param_pack.u_base).cuda(non_blocking=True))
-		self.register_buffer('w_shp_base', torch.Tensor(param_pack.w_shp_base).cuda(non_blocking=True))
-		self.register_buffer('w_exp_base', torch.Tensor(param_pack.w_exp_base).cuda(non_blocking=True))
-		self.keypoints = torch.Tensor(param_pack.keypoints).long()
- 
-		self.data_param = [self.param_mean, self.param_std, self.w_shp_base, self.u_base, self.w_exp_base]
-
-	def reconstruct_vertex_62(self, param, whitening=True, dense=False, transform=True, lmk_pts=68):
-		"""
-		Whitening param -> 3d vertex, based on the 3dmm param: u_base, w_shp, w_exp
-		dense: if True, return dense vertex, else return 68 sparse landmarks. All dense or sparse vertex is transformed to
-		image coordinate space, but without alignment caused by face cropping.
-		transform: whether transform to image space
-		Working with batched tensors. Using Fortan-type reshape.
-		"""
-
-		if whitening:
-			if param.shape[1] == 62:
-				param_ = param * self.param_std[:62] + self.param_mean[:62]
-			else:
-				raise RuntimeError('length of params mismatch')
-
-		p, offset, alpha_shp, alpha_exp = parse_param_62(param_)
-
-		if dense:
-			
-			vertex = p @ (self.u + self.w_shp @ alpha_shp + self.w_exp @ alpha_exp).contiguous().view(-1, 53215, 3).transpose(1,2) + offset
-			
-			if transform: 
-				# transform to image coordinate space
-				vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
-
-		else:
-			"""For 68 pts"""
-			vertex = p @ (self.u_base + self.w_shp_base @ alpha_shp + self.w_exp_base @ alpha_exp).contiguous().view(-1, lmk_pts, 3).transpose(1,2) + offset
-
-			if transform: 
-				# transform to image coordinate space
-				vertex[:, 1, :] = param_pack.std_size + 1 - vertex[:, 1, :]
-
-		return vertex
-
-	def forward(self, input, target):
-		_3D_attr, _3D_attr_GT, avgpool = self.I2P(input, target)
-			
-		vertex_lmk = self.reconstruct_vertex_62(_3D_attr, dense=False)
-		vertex_GT_lmk = self.reconstruct_vertex_62(_3D_attr_GT, dense=False)
-		self.loss['loss_LMK_f0'] = 0.05 *self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)		
-		self.loss['loss_Param_In'] = 0.02 * self.ParamLoss(_3D_attr, _3D_attr_GT)
-
-		point_residual = self.forwardDirection(vertex_lmk, avgpool, _3D_attr[:,12:52], _3D_attr[:,52:62])
-		vertex_lmk = vertex_lmk + 0.05 * point_residual
-		self.loss['loss_LMK_pointNet'] = 0.05 * self.LMKLoss_3D(vertex_lmk, vertex_GT_lmk, kp=True)
-
-		_3D_attr_S2 = self.reverseDirection(vertex_lmk)
-		self.loss['loss_Param_S2'] = 0.02 * self.ParamLoss(_3D_attr_S2, _3D_attr_GT, mode='only_3dmm')
-		self.loss['loss_Param_S1S2'] = 0.001 * self.ParamLoss(_3D_attr_S2, _3D_attr, mode='only_3dmm')
-
-		return self.loss
-
-	def forward_test(self, input):
-		"""test time forward"""
-		_3D_attr, _ = self.I2P.forward_test(input)
-		return _3D_attr
-
-	def get_losses(self):
-		return self.loss.keys()
-
-
-# Main model SynergyNet definition
-class WrapUpSynergyNet(nn.Module):
 	def __init__(self):
-		super(WrapUpSynergyNet, self).__init__()
-		self.triangles = sio.loadmat('./3dmm_data/tri.mat')['tri'] -1
+		super(SynergyNet, self).__init__()
+		self.triangles = sio.loadmat(os.path.join(prefix_path, '3dmm_data/tri.mat'))['tri'] -1
 		self.triangles = torch.Tensor(self.triangles.astype(np.int)).long()
 		args = types.SimpleNamespace()
 		args.arch = 'mobilenet_v2'
-		args.checkpoint_fp = 'pretrained/best.pth.tar'
+		args.checkpoint_fp = os.path.join(prefix_path, 'pretrained/best.pth.tar')
 
 		# Image-to-parameter
 		self.I2P = I2P(args)

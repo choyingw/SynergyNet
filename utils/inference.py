@@ -5,6 +5,23 @@ param_pack = ParamsPack()
 from math import cos, sin, atan2, asin, sqrt
 import cv2
 
+def write_obj(obj_name, vertices, triangles):
+    triangles = triangles.copy() # meshlab start with 1
+
+    if obj_name.split('.')[-1] != 'obj':
+        obj_name = obj_name + '.obj'
+
+    # write obj
+    with open(obj_name, 'w') as f:
+        # write vertices & colors
+        for i in range(vertices.shape[1]):
+            s = 'v {:.4f} {:.4f} {:.4f}\n'.format(vertices[0, i], vertices[1, i], vertices[2, i])
+            f.write(s)
+        # write f: ver ind/ uv ind
+        for i in range(triangles.shape[1]):
+            s = 'f {} {} {}\n'.format(triangles[2, i], triangles[1, i], triangles[0, i])
+            f.write(s)
+
 def parse_param(param):
     p_ = param[:12].reshape(3, 4)
     p = p_[:, :3]
