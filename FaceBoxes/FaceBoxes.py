@@ -46,11 +46,13 @@ def viz_bbox(img, dets, wfp='out.jpg'):
 
 class FaceBoxes:
     def __init__(self, timer_flag=False):
-        torch.set_grad_enabled(False)
-
         net = FaceBoxesNet(phase='test', size=None, num_classes=2)  # initialize detector
         self.net = load_model(net, pretrained_path=pretrained_path, load_to_cpu=True)
         self.net.eval()
+
+        for p in self.net.parameters():
+            p.requires_grad_(False)
+
         # print('Finished loading model!')
 
         self.timer_flag = timer_flag
