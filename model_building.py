@@ -66,7 +66,7 @@ class SynergyNet(nn.Module):
 	def __init__(self, args):
 		super(SynergyNet, self).__init__()
 		self.triangles = sio.loadmat('./3dmm_data/tri.mat')['tri'] -1
-		self.triangles = torch.Tensor(self.triangles.astype(np.int)).long().cuda()
+		self.triangles = torch.Tensor(self.triangles.astype(np.int64)).long().cuda()
 		self.img_size = args.img_size
 		# Image-to-parameter
 		self.I2P = I2P(args)
@@ -170,7 +170,7 @@ class WrapUpSynergyNet(nn.Module):
 	def __init__(self):
 		super(WrapUpSynergyNet, self).__init__()
 		self.triangles = sio.loadmat('./3dmm_data/tri.mat')['tri'] -1
-		self.triangles = torch.Tensor(self.triangles.astype(np.int)).long()
+		self.triangles = torch.Tensor(self.triangles.astype(np.int64)).long()
 		args = types.SimpleNamespace()
 		args.arch = 'mobilenet_v2'
 		args.checkpoint_fp = 'pretrained/best.pth.tar'
