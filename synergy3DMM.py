@@ -71,7 +71,7 @@ class SynergyNet(nn.Module):
 	def __init__(self):
 		super(SynergyNet, self).__init__()
 		self.triangles = sio.loadmat(os.path.join(prefix_path, '3dmm_data/tri.mat'))['tri'] -1
-		self.triangles = torch.Tensor(self.triangles.astype(np.int)).long()
+		self.triangles = torch.Tensor(self.triangles.astype(np.int64)).long()
 		args = types.SimpleNamespace()
 		args.arch = 'mobilenet_v2'
 		args.checkpoint_fp = os.path.join(prefix_path, 'pretrained/best.pth.tar')
