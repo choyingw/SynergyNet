@@ -145,11 +145,11 @@ The results (3D meshes and renderings) are stored under 'inference_output'
 
 ## <div align="center">Training UV-texture GAN</div>
 
-1. Acquire AFLW2000-3D dataset and use MGC-Net [<a href="https://github.com/jiaxiangshang/MGCNet/tree/master"] test pipeline to get UV-texture for the AFLW2000 images.
+1. Acquire AFLW2000-3D dataset and use [<a href="https://github.com/jiaxiangshang/MGCNet/tree/master">MGC-Net</a>] test pipeline to get UV-texture for the AFLW2000 images.
 
-2. Use Pix2Pix [<a href="https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix"] and train LSGAN with un-paired loss by their training recipe. In the input layer, concat the mean UV-texture and image and also shortcut add the mean texture at the output of generator.
+2. Use [<a href="https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix">Pix2Pix</a>] and train LSGAN with un-paired loss by their training recipe. In the input layer, concat the mean UV-texture and image and also shortcut add the mean texture at the output of generator.
 
-3. The mean UV-texture can be got from original BFM set or from face3d [<a href="https://github.com/yfeng95/face3d/blob/master/examples/Data/uv_texture_map.jpg"]
+3. The mean UV-texture can be got from original BFM set or from [<a href="https://github.com/yfeng95/face3d/blob/master/examples/Data/uv_texture_map.jpg">face3d</a>]
 
 ## <div align="center">More Results</div>
 
