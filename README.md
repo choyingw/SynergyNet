@@ -9,6 +9,8 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 
 [<a href="https://arxiv.org/abs/2110.09772">paper</a>] [<a href="https://youtu.be/i1Y8U2Z20ko">video</a>] [<a href="https://choyingw.github.io/works/SynergyNet/index.html">project page</a>]
 
+News [Dec 11, 2024]: Add details of training UV-texture GAN. See the section "Training UV-texture GAN"
+
 News [Jul 10, 2022]: Add simplified api for getting 3d landmarks, face mesh, and face pose in only one line. See "Simplified API" It's convenient if you simply want to plug in this method in your work.
 
 News: Add Colab demo 
@@ -140,6 +142,14 @@ Note that this artistic face dataset contains many different level/style face ab
     ```python uv_texture_realFaces.py -f texture_data/real/image00002_real_A.png``` (single image) 
 
 The results (3D meshes and renderings) are stored under 'inference_output'
+
+## <div align="center">Training UV-texture GAN</div>
+
+1. Acquire AFLW2000-3D dataset and use MGC-Net [<a href="https://github.com/jiaxiangshang/MGCNet/tree/master"] test pipeline to get UV-texture for the AFLW2000 images.
+
+2. Use Pix2Pix [<a href="https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix"] and train LSGAN with un-paired loss by their training recipe. In the input layer, concat the mean UV-texture and image and also shortcut add the mean texture at the output of generator.
+
+3. The mean UV-texture can be got from original BFM set or from face3d [<a href="https://github.com/yfeng95/face3d/blob/master/examples/Data/uv_texture_map.jpg"]
 
 ## <div align="center">More Results</div>
 
