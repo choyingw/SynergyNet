@@ -9,6 +9,8 @@ Cho-Ying Wu, Qiangeng Xu, Ulrich Neumann, CGIT Lab at University of Souther Cali
 
 [<a href="https://arxiv.org/abs/2110.09772">paper</a>] [<a href="https://youtu.be/i1Y8U2Z20ko">video</a>] [<a href="https://choyingw.github.io/works/SynergyNet/index.html">project page</a>]
 
+News [Feb 24, 2026] Re-upload the pretrained weights [here](https://drive.google.com/file/d/1RUOOWT1oSLOJYFpkWF_st2ZrVs8dpEcg/view?usp=sharing) since the original URL is invalid and multiple requests.
+
 News [Dec 11, 2024]: Add details of training UV-texture GAN. See the section "Training UV-texture GAN"
 
 News [Jul 10, 2022]: Add simplified api for getting 3d landmarks, face mesh, and face pose in only one line. See "Simplified API" It's convenient if you simply want to plug in this method in your work.
